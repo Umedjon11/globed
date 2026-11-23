@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-12">
+    <div class="mb-6 flex items-center justify-between">
+        <a href="{% url 'lesson_list' %}" class="text-xs font-semibold text-neutral-500 hover:text-black">
+            &larr; Назад к списку уроков
+        </a>
+        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+            Награда: +{{ lesson.xp_reward }} XP
+        </span>
+    </div>
+
+    <div class="bg-cardBg border border-borderLight p-8 sm:p-12 rounded-3xl shadow-sm mb-8">
+        <div class="inline-block bg-neutral-100 border border-borderLight px-3 py-1 rounded-full text-xs font-semibold text-neutral-700 mb-3">
+            {{ lesson.subject }}
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-black tracking-tight mb-4">{{ lesson.title }}</h1>
+        <p class="text-sm text-neutral-600 mb-8 leading-relaxed">{{ lesson.description }}</p>
+
+        <div class="space-y-6 pt-6 border-t border-borderLight">
+            <h2 class="text-lg font-bold text-black">Теоретический материал</h2>
+            {% for para in lesson.content.theory %}
+                <p class="text-sm text-neutral-800 leading-relaxed">{{ para }}</p>
+            {% endfor %}
+        </div>
+
+        {% if lesson.content.key_takeaways %}
+            <div class="mt-8 p-6 bg-white border border-borderLight rounded-2xl">
+                <h3 class="text-sm font-bold text-black mb-3">Главные выводы урока:</h3>
+                <ul class="space-y-2">
+                    {% for item in lesson.content.key_takeaways %}
+                        <li class="flex items-start text-xs text-neutral-700">
+                            <span class="mr-2 text-black font-bold">•</span>
+                            <span>{{ item }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if lesson.content.practice_quiz %}
+        <div class="bg-cardBg border border-borderLight p-8 sm:p-12 rounded-3xl shadow-sm">
+            <h2 class="text-xl font-bold text-black mb-2">Закрепление на практике</h2>
+            <p class="text-xs text-neutral-500 mb-8">Ответьте на контрольные вопросы для фиксации завершения урока и начисления XP</p>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                {% for q in lesson.content.practice_quiz %}
+                    <div class="bg-white border border-borderLight p-6 rounded-2xl">
+                        <div class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                            Задание {{ forloop.counter }}
+                        </div>
+                        <h3 class="text-sm sm:text-base font-bold text-black mb-4">{{ q.question }}</h3>
+
+                        <div class="space-y-2.5">
+                            {% for opt in q.options %}
+                                <label class="flex items-center p-3.5 border border-borderLight rounded-xl cursor-pointer hover:border-black transition">
+                                    <input type="radio" name="q_{{ forloop.parentloop.counter0 }}" value="{{ forloop.counter0 }}" required class="mr-3 text-black focus:ring-black">
+                                    <span class="text-xs sm:text-sm text-neutral-800">{{ opt }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="w-full bg-black text-white font-bold text-sm py-4 rounded-xl hover:bg-neutral-800 transition shadow-lg shadow-black/5 mt-4">
+                    Завершить урок и получить опыт &rarr;
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

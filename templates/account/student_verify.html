@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Верификация студента университета — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-6 py-12">
+    <div class="mb-6">
+        <a href="{% url 'post_list' %}" class="text-xs font-semibold text-neutral-500 hover:text-black">
+            &larr; Назад к сообществу
+        </a>
+    </div>
+
+    <div class="bg-cardBg border border-borderLight p-8 sm:p-10 rounded-3xl shadow-sm">
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 bg-neutral-100 border border-borderLight rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                🎓
+            </div>
+            <h1 class="text-2xl font-black text-black tracking-tight mb-2">Верификация статуса студента</h1>
+            <p class="text-xs text-neutral-600 leading-relaxed max-w-md mx-auto">
+                Публиковать советы и рекомендации в сообществе могут только действующие студенты зарубежных вузов, успешно прошедшие проверку.
+            </p>
+        </div>
+
+        {% if profile.verification_status == 'approved' and profile.is_verified_student %}
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 rounded-2xl text-center mb-6">
+                <div class="text-2xl mb-2">✓</div>
+                <h3 class="text-base font-bold mb-1">Статус подтвержден!</h3>
+                <p class="text-xs text-emerald-800 mb-4">
+                    Вы являетесь верифицированным студентом <strong>{{ profile.verified_university.name }}</strong>.
+                </p>
+                <a href="{% url 'post_create' %}" class="inline-block bg-black text-white text-xs font-bold px-6 py-3 rounded-xl hover:bg-neutral-800 transition">
+                    Опубликовать совет в сообществе &rarr;
+                </a>
+            </div>
+        {% elif profile.verification_status == 'pending' %}
+            <div class="bg-amber-50 border border-amber-200 text-amber-900 p-6 rounded-2xl text-center mb-6">
+                <div class="text-2xl mb-2">⏳</div>
+                <h3 class="text-base font-bold mb-1">Заявка на проверке</h3>
+                <p class="text-xs text-amber-800 leading-relaxed mb-4">
+                    Мы проверяем предоставленные данные об обучении в <strong>{{ profile.verified_university.name }}</strong>. Статус обновится после модерации.
+                </p>
+                <span class="inline-block text-[11px] font-semibold text-neutral-500 bg-white border border-borderLight px-3 py-1.5 rounded-lg">
+                    Университетская почта: {{ profile.university_email }}
+                </span>
+            </div>
+        {% else %}
+            {% if profile.verification_status == 'rejected' %}
+                <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl text-xs mb-6">
+                    Предыдущая заявка была отклонена. Пожалуйста, укажите точные данные и университетский адрес почты.
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div>
+                        <label class="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs mt-1.5">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="w-full bg-black text-white font-bold text-sm py-3.5 rounded-xl hover:bg-neutral-800 transition shadow-sm mt-4">
+                    Отправить на проверку модераторам &rarr;
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

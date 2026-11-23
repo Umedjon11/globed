@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globed.ai — Платформа подготовки к поступлению в зарубежные вузы с ИИ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lightBg: '#ffffff',
+                        cardBg: '#f9f9f9',
+                        borderLight: '#e5e5e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-neutral-900 font-sans antialiased selection:bg-black selection:text-white">
+
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-borderLight">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="{% url 'home' %}" class="text-2xl font-black tracking-tight text-black">Globed<span class="text-neutral-400">.ai</span></a>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-neutral-600">
+                <a href="{% url 'university_list' %}" class="hover:text-black transition">Вузы</a>
+                <a href="{% url 'book_list' %}" class="hover:text-black transition">Библиотека</a>
+                <a href="{% url 'post_list' %}" class="hover:text-black transition">Сообщество</a>
+                <a href="{% url 'pricing' %}" class="hover:text-black transition">Подписка</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="text-sm font-semibold bg-black text-white px-5 py-2.5 rounded-xl hover:bg-neutral-800 transition">В дашборд</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-sm font-medium px-4 py-2 rounded-xl hover:bg-neutral-100 transition text-neutral-700">Войти</a>
+                    <a href="{% url 'register' %}" class="text-sm font-medium bg-black text-white px-5 py-2.5 rounded-xl hover:bg-neutral-800 transition">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="relative pt-24 pb-20 md:pt-36 md:pb-32 overflow-hidden border-b border-borderLight">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center space-x-2 bg-neutral-100 border border-borderLight px-4 py-1.5 rounded-full text-xs font-medium text-neutral-700 mb-8">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>ИИ-платформа для школьников Таджикистана и мира</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.08] text-black">
+                Твой путь в <span class="underline decoration-neutral-400 underline-offset-8">Harvard</span>, <span class="underline decoration-neutral-400 underline-offset-8">Stanford</span> и топ-вузы мира
+            </h1>
+            
+            <p class="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-12 font-normal leading-relaxed">
+                Пройди входную диагностику, получи персональный план уроков от искусственного интеллекта и подготовься к поступлению шаг за шагом.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="w-full sm:w-auto bg-black text-white font-semibold px-8 py-4 rounded-2xl hover:bg-neutral-800 transition text-center shadow-lg shadow-black/5">
+                        Перейти в личный кабинет
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="w-full sm:w-auto bg-black text-white font-semibold px-8 py-4 rounded-2xl hover:bg-neutral-800 transition text-center shadow-lg shadow-black/5">
+                        Начать бесплатно
+                    </a>
+                    <a href="{% url 'login' %}" class="w-full sm:w-auto bg-cardBg border border-borderLight font-semibold px-8 py-4 rounded-2xl hover:bg-neutral-100 transition text-center text-neutral-800">
+                        Войти в аккаунт
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="mt-20 grid grid-cols-2 md:grid-cols-3 gap-8 pt-10 border-t border-borderLight text-left">
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-black">10-15</div>
+                    <div class="text-sm text-neutral-500 mt-1">Вопросов диагностики</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-black">3 Языка</div>
+                    <div class="text-sm text-neutral-500 mt-1">English, Русский, Тоҷикӣ</div>
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <div class="text-2xl md:text-3xl font-bold text-black">5000+</div>
+                    <div class="text-sm text-neutral-500 mt-1">Цель первого года</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-24 bg-lightBg border-b border-borderLight">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold tracking-tight mb-4 text-black">Всё для успешного поступления</h2>
+                <p class="text-neutral-600">Сочетание академической строгости и геймификации в стиле Duolingo.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-cardBg border border-borderLight p-8 rounded-3xl hover:border-neutral-300 transition">
+                    <div class="w-12 h-12 bg-white border border-borderLight rounded-2xl flex items-center justify-center text-xl font-bold mb-6 shadow-sm">🎯</div>
+                    <h3 class="text-xl font-semibold mb-3 text-black">Диагностика уровня</h3>
+                    <p class="text-neutral-600 text-sm leading-relaxed">ИИ оценивает твои текущие знания с учётом требований выбранных зарубежных университетов.</p>
+                </div>
+                <div class="bg-cardBg border border-borderLight p-8 rounded-3xl hover:border-neutral-300 transition">
+                    <div class="w-12 h-12 bg-white border border-borderLight rounded-2xl flex items-center justify-center text-xl font-bold mb-6 shadow-sm">⚡</div>
+                    <h3 class="text-xl font-semibold mb-3 text-black">Стрики и XP</h3>
+                    <p class="text-neutral-600 text-sm leading-relaxed">Поддерживай ежедневную серию активности, зарабатывай очки опыта и отслеживай прогресс на дашборде.</p>
+                </div>
+                <div class="bg-cardBg border border-borderLight p-8 rounded-3xl hover:border-neutral-300 transition">
+                    <div class="w-12 h-12 bg-white border border-borderLight rounded-2xl flex items-center justify-center text-xl font-bold mb-6 shadow-sm">👥</div>
+                    <h3 class="text-xl font-semibold mb-3 text-black">Советы студентов</h3>
+                    <p class="text-neutral-600 text-sm leading-relaxed">Читай проверенные гайды и рекомендации от реальных студентов топ-вузов мира с системой модерации.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="universities" class="py-24 bg-lightBg border-b border-borderLight">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold tracking-tight mb-4 text-black">Целевые вузы мира</h2>
+                <p class="text-neutral-600">Выбирай университеты, изучай требования и строй свою стратегию поступления.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <a href="{% url 'university_list' %}" class="bg-cardBg border border-borderLight p-6 rounded-2xl hover:border-black transition">
+                    <div class="text-lg font-bold text-black">Harvard</div>
+                    <div class="text-xs text-neutral-500 mt-1">USA · Ivy League</div>
+                </a>
+                <a href="{% url 'university_list' %}" class="bg-cardBg border border-borderLight p-6 rounded-2xl hover:border-black transition">
+                    <div class="text-lg font-bold text-black">Stanford</div>
+                    <div class="text-xs text-neutral-500 mt-1">USA · Silicon Valley</div>
+                </a>
+                <a href="{% url 'university_list' %}" class="bg-cardBg border border-borderLight p-6 rounded-2xl hover:border-black transition">
+                    <div class="text-lg font-bold text-black">MIT</div>
+                    <div class="text-xs text-neutral-500 mt-1">USA · STEM #1</div>
+                </a>
+                <a href="{% url 'university_list' %}" class="bg-cardBg border border-borderLight p-6 rounded-2xl hover:border-black transition">
+                    <div class="text-lg font-bold text-black">Oxford</div>
+                    <div class="text-xs text-neutral-500 mt-1">UK · Russell Group</div>
+                </a>
+            </div>
+            <div class="text-center mt-12">
+                <a href="{% url 'university_list' %}" class="inline-block bg-black text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-neutral-800 transition">
+                    Смотреть все университеты &rarr;
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 bg-lightBg text-sm text-neutral-500 border-t border-borderLight">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+            <div>&copy; 2026 Globed.ai. Все права защищены.</div>
+            <div class="flex space-x-6">
+                <a href="{% url 'university_list' %}" class="hover:text-black transition">Вузы</a>
+                <a href="{% url 'post_list' %}" class="hover:text-black transition">Сообщество</a>
+                <a href="{% url 'pricing' %}" class="hover:text-black transition">Тарифы</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

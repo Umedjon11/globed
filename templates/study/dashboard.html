@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between pb-8 mb-8 border-b border-borderLight gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-black tracking-tight">Привет, {{ profile.full_name }}! 👋</h1>
+            <p class="text-xs text-neutral-500 mt-1">Твой персональный образовательный трек к поступлению в топ-вузы</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="bg-cardBg border border-borderLight px-5 py-3 rounded-2xl flex items-center space-x-3">
+                <span class="text-2xl">🔥</span>
+                <div>
+                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Стрик</div>
+                    <div class="text-lg font-black text-black">{{ streak.current_streak }} дн.</div>
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-borderLight px-5 py-3 rounded-2xl flex items-center space-x-3">
+                <span class="text-2xl">⚡</span>
+                <div>
+                    <div class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Очки XP</div>
+                    <div class="text-lg font-black text-black">{{ xp_total }} XP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not profile.onboarding_completed %}
+        <div class="bg-black text-white p-8 rounded-3xl mb-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-black/5">
+            <div>
+                <span class="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Важный шаг</span>
+                <h2 class="text-2xl font-black tracking-tight mb-2">Пройди входную диагностику</h2>
+                <p class="text-neutral-400 text-sm max-w-xl">
+                    ИИ определит твои сильные стороны и составит персональный план подготовки для поступления.
+                </p>
+            </div>
+            <a href="{% url 'diagnostic_start' %}" class="bg-white text-black font-bold text-sm px-6 py-3.5 rounded-xl hover:bg-neutral-100 transition whitespace-nowrap">
+                Начать диагностику &rarr;
+            </a>
+        </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-cardBg border border-borderLight p-6 sm:p-8 rounded-3xl">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-black">Рекомендованные уроки</h2>
+                        <p class="text-xs text-neutral-500 mt-0.5">Учебный план, адаптированный под твои результаты</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <form method="post" action="{% url 'generate_lesson' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-xs font-bold bg-black text-white px-3.5 py-2 rounded-xl hover:bg-neutral-800 transition flex items-center space-x-1 shadow-sm">
+                                <span>⚡</span>
+                                <span>+ Новый урок</span>
+                            </button>
+                        </form>
+                        <a href="{% url 'lesson_list' %}" class="text-xs font-bold text-neutral-700 hover:text-black">
+                            Все уроки &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    {% for lesson in lessons %}
+                        <div class="bg-white border border-borderLight p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-black transition">
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-semibold bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-md">
+                                        {{ lesson.subject }}
+                                    </span>
+                                    <span class="text-xs text-emerald-600 font-bold">+{{ lesson.xp_reward }} XP</span>
+                                </div>
+                                <h3 class="text-base font-bold text-black">{{ lesson.title }}</h3>
+                                <p class="text-xs text-neutral-600 line-clamp-1">{{ lesson.description }}</p>
+                            </div>
+
+                            <div>
+                                {% if lesson.id in completed_lesson_ids %}
+                                    <a href="{% url 'lesson_detail' lesson.id %}" class="inline-flex items-center space-x-1 text-xs font-bold bg-neutral-100 text-neutral-800 px-4 py-2.5 rounded-xl hover:bg-neutral-200 transition">
+                                        <span>✓</span>
+                                        <span>Повторить</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'lesson_detail' lesson.id %}" class="inline-block text-xs font-bold bg-black text-white px-5 py-2.5 rounded-xl hover:bg-neutral-800 transition">
+                                        Начать урок &rarr;
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-8 text-xs text-neutral-500">
+                            Уроки формируются... Пройдите входную диагностику для генерации индивидуальных заданий.
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-borderLight p-6 sm:p-8 rounded-3xl">
+                <h2 class="text-xl font-bold text-black mb-4">Твой уровень по предметам</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% for sl in subject_levels %}
+                        <div class="bg-white border border-borderLight p-4 rounded-2xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-black">{{ sl.subject }}</span>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded-md {% if sl.level == 'Advanced' %}bg-emerald-100 text-emerald-800{% elif sl.level == 'Intermediate' %}bg-neutral-100 text-neutral-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                    {{ sl.level }}
+                                </span>
+                            </div>
+                            <div class="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
+                                <div class="bg-black h-full rounded-full" style="width: {{ sl.score }}%;"></div>
+                            </div>
+                            <div class="text-right text-xs text-neutral-400 mt-1">{{ sl.score }}%</div>
+                        </div>
+                    {% empty %}
+                        <div class="col-span-2 text-center py-6 text-xs text-neutral-500">
+                            Пройдите входную диагностику, чтобы увидеть свой уровень знаний по предметам.
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <div class="bg-cardBg border border-borderLight p-6 rounded-3xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-bold text-black">Целевые вузы</h2>
+                    <a href="{% url 'university_list' %}" class="text-xs font-semibold text-neutral-600 hover:text-black">+ Изменить</a>
+                </div>
+
+                <div class="space-y-3">
+                    {% for tu in target_unis %}
+                        <div class="bg-white border border-borderLight p-3.5 rounded-xl flex items-center justify-between">
+                            <div>
+                                <a href="{% url 'university_detail' tu.university.pk %}" class="text-xs font-bold text-black hover:underline block">
+                                    {{ tu.university.name }}
+                                </a>
+                                <span class="text-xs text-neutral-400">{{ tu.university.country }}</span>
+                            </div>
+                            <span class="text-xs font-semibold text-neutral-400">#{{ tu.university.ranking }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="text-xs text-neutral-500 py-3">Целевые университеты пока не выбраны.</p>
+                        <a href="{% url 'university_list' %}" class="block text-center text-xs font-bold bg-white border border-borderLight py-2.5 rounded-xl hover:bg-neutral-100 transition">
+                            Выбрать университеты
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-borderLight p-6 rounded-3xl">
+                <h2 class="text-base font-bold text-black mb-4">Быстрые переходы</h2>
+                <div class="space-y-2.5">
+                    <a href="{% url 'chat' %}" class="flex items-center justify-between p-3.5 bg-white border border-borderLight rounded-xl text-xs font-semibold text-neutral-800 hover:border-black transition">
+                        <span class="flex items-center space-x-2">
+                            <span>🤖</span>
+                            <span>ИИ-Ассистент по поступлению</span>
+                        </span>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="{% url 'book_list' %}" class="flex items-center justify-between p-3.5 bg-white border border-borderLight rounded-xl text-xs font-semibold text-neutral-800 hover:border-black transition">
+                        <span class="flex items-center space-x-2">
+                            <span>📚</span>
+                            <span>Библиотека книг и гайдов</span>
+                        </span>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="{% url 'post_list' %}" class="flex items-center justify-between p-3.5 bg-white border border-borderLight rounded-xl text-xs font-semibold text-neutral-800 hover:border-black transition">
+                        <span class="flex items-center space-x-2">
+                            <span>💬</span>
+                            <span>Советы студентов топ-вузов</span>
+                        </span>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="{% url 'pricing' %}" class="flex items-center justify-between p-3.5 bg-white border border-borderLight rounded-xl text-xs font-semibold text-neutral-800 hover:border-black transition">
+                        <span class="flex items-center space-x-2">
+                            <span>⭐</span>
+                            <span>Подписка Globed Pro</span>
+                        </span>
+                        <span>&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты диагностики — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-12">
+    <div class="bg-cardBg border border-borderLight p-8 sm:p-12 rounded-3xl shadow-sm text-center">
+        <div class="w-16 h-16 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-3xl flex items-center justify-center text-3xl font-bold mx-auto mb-4">
+            ✓
+        </div>
+
+        <h1 class="text-3xl font-black text-black tracking-tight mb-2">Диагностика завершена!</h1>
+        <p class="text-sm text-neutral-600 mb-6">
+            ИИ сформировал ваш стартовый академический профиль и начислил <strong class="text-black">+100 XP</strong>
+        </p>
+
+        <div class="inline-block bg-white border border-borderLight p-6 rounded-2xl mb-8 shadow-sm">
+            <span class="text-xs font-semibold text-neutral-400 uppercase tracking-wider block mb-1">Общий результат</span>
+            <span class="text-4xl font-black text-black">{{ evaluation.overall_percent }}%</span>
+            <span class="text-xs text-neutral-500 block mt-1">Верно {{ evaluation.correct_count }} из {{ evaluation.total_questions }} заданий</span>
+        </div>
+
+        <div class="text-left mb-8">
+            <h2 class="text-base font-bold text-black mb-4">Оценка по предметным направлениям:</h2>
+            <div class="space-y-4">
+                {% for subj, data in evaluation.subject_levels.items %}
+                    <div class="bg-white border border-borderLight p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <span class="text-sm font-bold text-black block">{{ subj }}</span>
+                            <span class="text-xs text-neutral-500">{{ data.correct }} из {{ data.total }} верно</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-32 bg-neutral-100 h-2 rounded-full overflow-hidden">
+                                <div class="bg-black h-full rounded-full" style="width: {{ data.score }}%;"></div>
+                            </div>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full {% if data.level == 'Advanced' %}bg-emerald-100 text-emerald-800{% elif data.level == 'Intermediate' %}bg-neutral-100 text-neutral-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                {{ data.level }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-borderLight flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{% url 'dashboard' %}" class="w-full sm:w-auto bg-black text-white font-bold text-sm px-8 py-4 rounded-xl hover:bg-neutral-800 transition shadow-sm">
+                Перейти в личный кабинет &rarr;
+            </a>
+            <a href="{% url 'lesson_list' %}" class="w-full sm:w-auto bg-white border border-borderLight font-semibold text-sm text-neutral-800 px-8 py-4 rounded-xl hover:bg-neutral-100 transition">
+                Начать первый урок
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

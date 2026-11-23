@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Персональные уроки — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-8 border-b border-borderLight gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-black tracking-tight">Персональные уроки</h1>
+            <p class="text-xs text-neutral-500 mt-1">Обучающие модули от ИИ для подготовки к поступлению и стандартизированным тестам</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="text-xs font-semibold px-3 py-2 bg-neutral-100 rounded-xl text-neutral-600 border border-borderLight hidden md:block">
+                {% if has_pro %}
+                    <span class="text-emerald-700 font-bold">⭐ Pro: Безлимитные уроки</span>
+                {% else %}
+                    <span>Использовано: <strong>{{ counter.ai_lessons }} / 3</strong> уроков сегодня</span>
+                {% endif %}
+            </div>
+
+            <button type="button" onclick="document.getElementById('generate-modal').classList.remove('hidden')" class="bg-black text-white text-xs font-bold px-5 py-3 rounded-xl hover:bg-neutral-800 transition flex items-center space-x-1.5 shadow-sm">
+                <span>⚡</span>
+                <span>Сгенерировать новый урок</span>
+            </button>
+        </div>
+    </div>
+
+    {% if subjects %}
+        <div class="flex items-center space-x-2 overflow-x-auto pb-4 mb-6">
+            <a href="{% url 'lesson_list' %}" class="text-xs font-bold px-4 py-2 rounded-xl transition {% if not request.GET.subject %}bg-black text-white{% else %}bg-cardBg border border-borderLight text-neutral-700 hover:bg-neutral-100{% endif %}">
+                Все предметы
+            </a>
+            {% for s in subjects %}
+                <a href="{% url 'lesson_list' %}?subject={{ s|urlencode }}" class="text-xs font-bold px-4 py-2 rounded-xl whitespace-nowrap transition {% if request.GET.subject == s %}bg-black text-white{% else %}bg-cardBg border border-borderLight text-neutral-700 hover:bg-neutral-100{% endif %}">
+                    {{ s }}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for lesson in lessons %}
+            <div class="bg-cardBg border border-borderLight p-6 rounded-3xl flex flex-col justify-between hover:border-black transition">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full">
+                            {{ lesson.subject }}
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600">
+                            +{{ lesson.xp_reward }} XP
+                        </span>
+                    </div>
+
+                    <h2 class="text-lg font-bold text-black mb-2">{{ lesson.title }}</h2>
+                    <p class="text-xs text-neutral-600 line-clamp-3 mb-4 leading-relaxed">{{ lesson.description }}</p>
+                </div>
+
+                <div class="pt-4 border-t border-borderLight flex items-center justify-between">
+                    <div>
+                        {% if lesson.id in completed_ids %}
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">✓ Пройден</span>
+                        {% else %}
+                            <span class="text-xs font-semibold text-neutral-400">Не начат</span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'lesson_detail' lesson.pk %}" class="text-xs font-bold bg-black text-white px-4 py-2 rounded-xl hover:bg-neutral-800 transition">
+                        {% if lesson.id in completed_ids %}Повторить{% else %}Перейти к уроку &rarr;{% endif %}
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-2 text-center py-16 bg-cardBg border border-borderLight rounded-3xl">
+                <p class="text-neutral-500 text-sm mb-4">У вас пока нет сформированных уроков.</p>
+                <button type="button" onclick="document.getElementById('generate-modal').classList.remove('hidden')" class="bg-black text-white text-xs font-bold px-6 py-3 rounded-xl hover:bg-neutral-800 transition">
+                    Сгенерировать первый урок с ИИ &rarr;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="generate-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-borderLight w-full max-w-md rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-black">Сгенерировать персональный урок</h3>
+            <button type="button" onclick="document.getElementById('generate-modal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 flex items-center justify-center font-bold text-sm">
+                &times;
+            </button>
+        </div>
+
+        <p class="text-xs text-neutral-500 mb-6">
+            ИИ разработает персональную теоретическую часть и практические контрольные задания под ваш текущий уровень.
+        </p>
+
+        <form method="post" action="{% url 'generate_lesson' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-semibold text-neutral-600 mb-1.5">Выберите предметную область</label>
+                <select name="subject" class="w-full bg-cardBg border border-neutral-300 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-black">
+                    <option value="Математика (SAT)">Математика (SAT Math)</option>
+                    <option value="Английский (Reading & Writing)">Английский (Reading & Writing)</option>
+                    <option value="Критическое мышление">Критическое мышление</option>
+                </select>
+            </div>
+
+            {% if not has_pro %}
+                <div class="p-3 bg-neutral-50 border border-borderLight rounded-xl text-xs text-neutral-500 flex justify-between items-center">
+                    <span>Доступно сегодня (Free):</span>
+                    <strong class="text-black">{{ counter.ai_lessons }} / 3</strong>
+                </div>
+            {% endif %}
+
+            <button type="submit" class="w-full bg-black text-white font-bold text-xs py-3.5 rounded-xl hover:bg-neutral-800 transition shadow-sm mt-2 flex items-center justify-center space-x-1.5">
+                <span>⚡</span>
+                <span>Сгенерировать и начать урок &rarr;</span>
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

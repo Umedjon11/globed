@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Входная диагностика — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-10">
+    <div class="mb-8">
+        <div class="flex items-center justify-between text-xs font-bold text-neutral-500 mb-2">
+            <span id="progress-text">Вопрос 1 из {{ questions|length }}</span>
+            <span id="progress-percent" class="text-black font-black">8%</span>
+        </div>
+        <div class="w-full bg-neutral-200 h-2.5 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-black h-full rounded-full transition-all duration-300 ease-out" style="width: 8%;"></div>
+        </div>
+    </div>
+
+    <form id="diagnostic-form" method="post" action="{% url 'diagnostic_session' %}">
+        {% csrf_token %}
+        <input type="hidden" name="session_id" value="{{ session.id }}">
+
+        {% for q in questions %}
+            <div class="question-step {% if not forloop.first %}hidden{% endif %} transition-opacity duration-200" data-step="{{ forloop.counter0 }}">
+                <div class="bg-cardBg border border-borderLight p-6 sm:p-10 rounded-3xl shadow-sm mb-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                            Задание {{ forloop.counter }}
+                        </span>
+                        <span class="text-xs font-bold bg-neutral-100 border border-borderLight text-neutral-800 px-3 py-1 rounded-full">
+                            {{ q.subject }}
+                        </span>
+                    </div>
+
+                    <h2 class="text-lg sm:text-xl font-bold text-black mb-8 leading-relaxed">
+                        {{ q.question }}
+                    </h2>
+
+                    <div class="space-y-3.5">
+                        {% for opt in q.options %}
+                            <label class="option-label flex items-start p-4 sm:p-4.5 bg-white border border-borderLight rounded-2xl cursor-pointer hover:border-neutral-400 transition-all select-none">
+                                <input type="radio" name="q_{{ q.id }}" value="{{ forloop.counter0 }}" required class="sr-only option-input" onchange="handleOptionSelect({{ forloop.parentloop.counter0 }})">
+                                <span class="option-badge w-7 h-7 rounded-xl border border-neutral-300 flex items-center justify-center text-xs font-bold text-neutral-500 mr-3.5 flex-shrink-0 transition-colors">
+                                    {% if forloop.counter0 == 0 %}A{% elif forloop.counter0 == 1 %}B{% elif forloop.counter0 == 2 %}C{% else %}D{% endif %}
+                                </span>
+                                <span class="option-text text-sm font-medium text-neutral-800 leading-snug pt-0.5">
+                                    {{ opt }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="flex items-center justify-between pt-2">
+            <button type="button" id="prev-btn" onclick="prevStep()" class="text-xs font-bold text-neutral-500 hover:text-black px-5 py-3 rounded-xl border border-borderLight bg-white hover:bg-neutral-50 transition opacity-0 pointer-events-none">
+                &larr; Назад
+            </button>
+
+            <button type="button" id="next-btn" onclick="nextStep()" class="bg-black text-white font-bold text-sm px-8 py-3.5 rounded-xl hover:bg-neutral-800 transition shadow-sm opacity-50 pointer-events-none">
+                Следующий вопрос &rarr;
+            </button>
+
+            <button type="submit" id="submit-btn" class="hidden bg-black text-white font-bold text-sm px-8 py-3.5 rounded-xl hover:bg-neutral-800 transition shadow-sm">
+                Завершить диагностику &rarr;
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const totalQuestions = {{ questions|length }};
+    let currentStep = 0;
+
+    function updateStep() {
+        const steps = document.querySelectorAll('.question-step');
+        steps.forEach((step, idx) => {
+            if (idx === currentStep) {
+                step.classList.remove('hidden');
+            } else {
+                step.classList.add('hidden');
+            }
+        });
+
+        const percent = Math.round(((currentStep + 1) / totalQuestions) * 100);
+        document.getElementById('progress-bar').style.width = percent + '%';
+        document.getElementById('progress-percent').innerText = percent + '%';
+        document.getElementById('progress-text').innerText = `Вопрос ${currentStep + 1} из ${totalQuestions}`;
+
+        const prevBtn = document.getElementById('prev-btn');
+        if (currentStep > 0) {
+            prevBtn.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+            prevBtn.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        const isLast = (currentStep === totalQuestions - 1);
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (isLast) {
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        } else {
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        }
+
+        checkAnswerSelected();
+    }
+
+    function checkAnswerSelected() {
+        const currentStepEl = document.querySelector(`.question-step[data-step="${currentStep}"]`);
+        const checked = currentStepEl.querySelector('.option-input:checked');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (checked) {
+            nextBtn.classList.remove('opacity-50', 'pointer-events-none');
+            submitBtn.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            nextBtn.classList.add('opacity-50', 'pointer-events-none');
+            submitBtn.classList.add('opacity-50', 'pointer-events-none');
+        }
+    }
+
+    function handleOptionSelect(stepIndex) {
+        const stepEl = document.querySelector(`.question-step[data-step="${stepIndex}"]`);
+        const labels = stepEl.querySelectorAll('.option-label');
+        labels.forEach(label => {
+            const input = label.querySelector('.option-input');
+            const badge = label.querySelector('.option-badge');
+            if (input && input.checked) {
+                label.classList.add('border-black', 'bg-neutral-50', 'shadow-xs');
+                label.classList.remove('border-borderLight', 'bg-white');
+                badge.classList.add('bg-black', 'text-white', 'border-black');
+                badge.classList.remove('text-neutral-500', 'border-neutral-300');
+            } else {
+                label.classList.remove('border-black', 'bg-neutral-50', 'shadow-xs');
+                label.classList.add('border-borderLight', 'bg-white');
+                badge.classList.remove('bg-black', 'text-white', 'border-black');
+                badge.classList.add('text-neutral-500', 'border-neutral-300');
+            }
+        });
+
+        checkAnswerSelected();
+    }
+
+    function nextStep() {
+        if (currentStep < totalQuestions - 1) {
+            currentStep++;
+            updateStep();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            updateStep();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStep();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Входная диагностика — Globed.ai{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-16">
+    <div class="bg-cardBg border border-borderLight p-8 sm:p-12 rounded-3xl text-center shadow-sm">
+        <div class="w-16 h-16 bg-neutral-100 border border-borderLight rounded-3xl flex items-center justify-center text-3xl font-bold mx-auto mb-6 shadow-sm">
+            🎯
+        </div>
+
+        <h1 class="text-3xl font-black text-black tracking-tight mb-3">Входная диагностика уровня</h1>
+        <p class="text-neutral-600 text-sm leading-relaxed mb-8 max-w-lg mx-auto">
+            ИИ-система Globed подготовила 12 вопросов для точной оценки вашей академической готовности к выбранным зарубежным университетам.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+            <div class="bg-white border border-borderLight p-4 rounded-2xl">
+                <span class="text-xs font-semibold text-neutral-400 block mb-1">Вопросы</span>
+                <span class="text-base font-bold text-black">12 заданий</span>
+            </div>
+            <div class="bg-white border border-borderLight p-4 rounded-2xl">
+                <span class="text-xs font-semibold text-neutral-400 block mb-1">Время</span>
+                <span class="text-base font-bold text-black">~10-15 минут</span>
+            </div>
+            <div class="bg-white border border-borderLight p-4 rounded-2xl">
+                <span class="text-xs font-semibold text-neutral-400 block mb-1">Награда</span>
+                <span class="text-base font-bold text-emerald-600">+100 XP</span>
+            </div>
+        </div>
+
+        <div class="bg-white border border-borderLight p-6 rounded-2xl text-left text-xs text-neutral-600 space-y-2 mb-8">
+            <p class="font-semibold text-neutral-900">Что проверяется:</p>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>Математическая логика и алгебра (формат SAT Math)</li>
+                <li>Чтение и грамматика английского языка (Reading & Writing)</li>
+                <li>Аналитическое и критическое мышление</li>
+                <li>Осведомленность о процессе поступления за рубеж</li>
+            </ul>
+        </div>
+
+        {% if target_count == 0 %}
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-sm mb-6">
+                Вы еще не выбрали целевые университеты. Рекомендуется сначала выбрать хотя бы 1 вуз.
+            </div>
+            <a href="{% url 'university_list' %}" class="inline-block bg-black text-white font-semibold text-sm px-8 py-4 rounded-xl hover:bg-neutral-800 transition">
+                Выбрать целевые вузы &rarr;
+            </a>
+        {% else %}
+            <a href="{% url 'diagnostic_session' %}" class="inline-block bg-black text-white font-bold text-base px-10 py-4 rounded-2xl hover:bg-neutral-800 transition shadow-lg shadow-black/5">
+                Начать диагностику &rarr;
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

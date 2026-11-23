@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+
+{% block title %}Тарифные планы — Globed.ai Pro{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-16">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="inline-block bg-neutral-100 border border-borderLight px-4 py-1.5 rounded-full text-xs font-semibold text-neutral-700 mb-4">
+            Прозрачные фиксированные тарифы
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-black text-black tracking-tight mb-4">Инвестируй в своё будущее</h1>
+        <p class="text-sm text-neutral-600 leading-relaxed">
+            Бесплатная версия покрывает базовую подготовку. Подписка Pro открывает безлимитный доступ к персональному ИИ-репетитору и разборам эссе.
+        </p>
+    </div>
+
+    {% if user_sub %}
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 rounded-3xl mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 block mb-1">Ваш текущий тариф:</span>
+                <h3 class="text-xl font-bold">{{ user_sub.plan.name }}</h3>
+                <p class="text-xs text-emerald-700 mt-1">Активен до: <strong>{{ user_sub.ends_at|date:"d.m.Y" }}</strong></p>
+            </div>
+            <span class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl">Статус: Активен</span>
+        </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div class="lg:col-span-5 bg-cardBg border border-borderLight rounded-3xl p-8 flex flex-col justify-between shadow-sm {% if not user_sub and user.is_authenticated %}border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10{% endif %}">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Базовый</span>
+                    {% if not user_sub and user.is_authenticated %}
+                        <span class="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            ✓ Текущий тариф
+                        </span>
+                    {% endif %}
+                </div>
+
+                <h3 class="text-2xl font-black text-black mb-2">Free</h3>
+                <div class="flex items-baseline space-x-1 mb-6">
+                    <span class="text-4xl font-black text-black">$0</span>
+                    <span class="text-xs text-neutral-500">/ навсегда</span>
+                </div>
+
+                <div class="space-y-3.5 pt-6 border-t border-borderLight mb-8">
+                    <div class="flex items-start text-xs text-neutral-700 space-x-2">
+                        <span class="{% if not user_sub and user.is_authenticated %}text-emerald-600{% else %}text-black{% endif %} font-bold">✓</span>
+                        <span>Входная диагностика уровня</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-700 space-x-2">
+                        <span class="{% if not user_sub and user.is_authenticated %}text-emerald-600{% else %}text-black{% endif %} font-bold">✓</span>
+                        <span>До 3 ИИ-уроков в день</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-700 space-x-2">
+                        <span class="{% if not user_sub and user.is_authenticated %}text-emerald-600{% else %}text-black{% endif %} font-bold">✓</span>
+                        <span>Базовый доступ к библиотеке</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-700 space-x-2">
+                        <span class="{% if not user_sub and user.is_authenticated %}text-emerald-600{% else %}text-black{% endif %} font-bold">✓</span>
+                        <span>Чтение проверенных советов студентов</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-700 space-x-2">
+                        <span class="{% if not user_sub and user.is_authenticated %}text-emerald-600{% else %}text-black{% endif %} font-bold">✓</span>
+                        <span>Учёт стриков и очков XP</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                {% if user.is_authenticated %}
+                    {% if not user_sub %}
+                        <button type="button" disabled class="w-full bg-emerald-600 text-white text-xs font-bold py-3.5 rounded-xl cursor-default flex items-center justify-center space-x-1.5 shadow-sm">
+                            <span>✓</span>
+                            <span>Выбран (активен)</span>
+                        </button>
+                    {% else %}
+                        <button type="button" disabled class="w-full bg-neutral-200 text-neutral-500 text-xs font-bold py-3.5 rounded-xl cursor-default">
+                            Базовый план
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'register' %}" class="block text-center w-full bg-neutral-900 text-white text-xs font-bold py-3.5 rounded-xl hover:bg-black transition">
+                        Начать бесплатно
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-cardBg border-2 {% if user_sub %}border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10{% else %}border-black{% endif %} rounded-3xl p-8 sm:p-10 flex flex-col justify-between relative shadow-xl shadow-black/5">
+            <div class="absolute top-6 right-6 flex items-center space-x-2">
+                {% if user_sub %}
+                    <span class="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center space-x-1">
+                        <span>✓</span>
+                        <span>Подписка активна</span>
+                    </span>
+                {% endif %}
+                <span id="pro-badge-discount" class="bg-black text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Скидка 35% 🔥
+                </span>
+            </div>
+
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-neutral-500 block mb-1">Премиум подготовка</span>
+                <h3 class="text-2xl sm:text-3xl font-black text-black mb-4">Globed.ai Pro</h3>
+
+                <div class="bg-neutral-100 p-1.5 rounded-2xl flex items-center gap-1.5 mb-6 border border-borderLight">
+                    {% for p in plans %}
+                        <button type="button" onclick="selectDuration('{{ p.id }}', '{{ p.name|escapejs }}', '{{ p.price }}', '{{ p.duration_months }}', '{{ p.discount_percent }}')" id="pill-{{ p.id }}" class="duration-pill flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-center {% if forloop.last %}bg-black text-white shadow-xs{% else %}text-neutral-700 hover:text-black hover:bg-white/60{% endif %}">
+                            {{ p.duration_months }} {% if p.duration_months == 1 %}месяц{% elif p.duration_months == 3 %}месяца{% else %}мес. (Год){% endif %}
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <div class="flex items-baseline space-x-3 mb-2">
+                    <span id="pro-display-price" class="text-4xl sm:text-5xl font-black text-black">$79.99</span>
+                    <span id="pro-display-period" class="text-xs sm:text-sm text-neutral-500 font-medium">/ 12 мес. ($6.67/мес)</span>
+                </div>
+                <p id="pro-savings-note" class="text-xs text-emerald-700 font-semibold mb-6">Максимальная выгода: экономия 35% при оплате за год</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 border-t border-borderLight mb-8">
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>Неограниченные уроки от ИИ</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>ИИ-ассистент 24/7 без лимитов</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>Вся библиотека SAT/IELTS</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>Разбор личного эссе и мотивации</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>Личный трекер дедлайнов вузов</span>
+                    </div>
+                    <div class="flex items-start text-xs text-neutral-800 space-x-2">
+                        <span class="text-black font-bold">✓</span>
+                        <span>Сертификат академической готовности</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                {% if user.is_authenticated %}
+                    {% if user_sub %}
+                        <button id="pro-submit-btn" type="button" disabled class="w-full bg-emerald-600 text-white text-xs sm:text-sm font-bold py-4 rounded-xl cursor-default flex items-center justify-center space-x-2 shadow-sm">
+                            <span id="pro-btn-text">✓ Выбран (активен)</span>
+                        </button>
+                        <div class="text-center mt-3">
+                            <button type="button" onclick="triggerCheckout()" class="text-xs text-neutral-500 hover:text-black underline font-semibold transition">
+                                Продлить или сменить период подписки
+                            </button>
+                        </div>
+                    {% else %}
+                        <button id="pro-submit-btn" type="button" onclick="triggerCheckout()" class="w-full bg-black text-white text-xs sm:text-sm font-bold py-4 rounded-xl hover:bg-neutral-800 transition shadow-lg shadow-black/5 flex items-center justify-center space-x-2">
+                            <span id="pro-btn-text">Оформить Globed Pro &rarr;</span>
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'pricing' %}" class="block text-center w-full bg-black text-white text-xs sm:text-sm font-bold py-4 rounded-xl hover:bg-neutral-800 transition">
+                        Войти для оформления Pro &rarr;
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-16 text-center text-xs text-neutral-400">
+        Оплата производится единоразово на фиксированный срок (1, 3 или 12 месяцев) без автоматических списаний.
+    </div>
+</div>
+
+<div id="checkout-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-borderLight w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="p-6 border-b border-borderLight flex items-center justify-between bg-cardBg">
+            <div>
+                <h3 class="text-base font-bold text-black">Оформление подписки Pro</h3>
+                <p id="modal-plan-name" class="text-xs text-neutral-500 mt-0.5">Тариф: Pro</p>
+            </div>
+            <button type="button" onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 flex items-center justify-center font-bold text-sm transition">
+                &times;
+            </button>
+        </div>
+
+        <form id="checkout-form" method="post" action="" class="p-6 space-y-5">
+            {% csrf_token %}
+
+            <div class="relative w-full h-40 bg-gradient-to-tr from-neutral-900 via-neutral-800 to-neutral-700 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold tracking-widest text-neutral-300">Globed.ai Pro Card</span>
+                    <span class="text-xs font-mono bg-white/20 px-2 py-0.5 rounded text-white">DEBIT</span>
+                </div>
+                <div id="card-preview-number" class="text-lg font-mono tracking-widest font-bold">
+                    •••• •••• •••• ••••
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-mono text-neutral-300 uppercase">
+                    <span id="card-preview-holder" class="truncate max-w-[180px]">ИМЯ ДЕРЖАТЕЛЯ</span>
+                    <span id="card-preview-exp">MM/YY</span>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 border-b border-borderLight pb-2">
+                <button type="button" class="text-xs font-bold text-black border-b-2 border-black pb-1 px-1">
+                    💳 Банковская карта
+                </button>
+                <button type="button" class="text-xs font-medium text-neutral-400 hover:text-black pb-1 px-1">
+                    📱 Alif Mobi / Корти Милли
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-600 mb-1.5">Номер карты</label>
+                    <input id="card-number" type="text" maxlength="19" placeholder="0000 0000 0000 0000" value="4400 1234 5678 9012" oninput="formatCardNumber(this)" class="w-full bg-cardBg border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 font-mono focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-neutral-600 mb-1.5">Срок действия</label>
+                        <input id="card-exp" type="text" maxlength="5" placeholder="MM/YY" value="12/28" oninput="formatExp(this)" class="w-full bg-cardBg border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 font-mono focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-neutral-600 mb-1.5">CVC / CVV</label>
+                        <input id="card-cvc" type="password" maxlength="3" placeholder="•••" value="888" class="w-full bg-cardBg border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 font-mono focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-600 mb-1.5">Имя и фамилия на карте</label>
+                    <input id="card-holder" type="text" placeholder="UMEDJON NAZAROV" value="{{ user.profile.full_name|default:'STUDENT NAME'|upper }}" oninput="updateHolder(this)" class="w-full bg-cardBg border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 uppercase focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+            </div>
+
+            <div class="p-3 bg-neutral-50 border border-borderLight rounded-xl flex items-center justify-between text-xs">
+                <span class="text-neutral-500">Безопасный демо-шлюз: списания средств не произойдет.</span>
+                <span class="text-emerald-600 font-bold">SSL 256-bit</span>
+            </div>
+
+            <button id="modal-submit-btn" type="submit" class="w-full bg-black text-white font-bold text-sm py-4 rounded-xl hover:bg-neutral-800 transition shadow-lg shadow-black/5 flex items-center justify-center space-x-2">
+                <span>Подтвердить и активировать</span>
+                <span id="modal-submit-price">$0.00</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentSelectedPlan = {
+        id: '',
+        name: '',
+        price: '',
+        months: '',
+        discount: ''
+    };
+
+    const hasUserSub = {% if user_sub %}true{% else %}false{% endif %};
+
+    function selectDuration(id, name, price, months, discount) {
+        currentSelectedPlan = { id, name, price, months, discount };
+
+        document.querySelectorAll('.duration-pill').forEach(btn => {
+            btn.classList.remove('bg-black', 'text-white', 'shadow-xs');
+            btn.classList.add('text-neutral-700');
+        });
+        const activePill = document.getElementById('pill-' + id);
+        if (activePill) {
+            activePill.classList.add('bg-black', 'text-white', 'shadow-xs');
+            activePill.classList.remove('text-neutral-700');
+        }
+
+        document.getElementById('pro-display-price').innerText = `$${price}`;
+        const monthlyEq = (parseFloat(price) / parseInt(months)).toFixed(2);
+        document.getElementById('pro-display-period').innerText = `/ ${months} мес. ($${monthlyEq}/мес)`;
+
+        const badge = document.getElementById('pro-badge-discount');
+        const savings = document.getElementById('pro-savings-note');
+        if (parseInt(discount) > 0) {
+            badge.innerText = `Скидка ${discount}% 🔥`;
+            badge.classList.remove('hidden');
+            savings.innerText = `Экономия ${discount}% при оплате на ${months} мес.`;
+            savings.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+            savings.classList.add('hidden');
+        }
+
+        if (!hasUserSub) {
+            const btnText = document.getElementById('pro-btn-text');
+            if (btnText) {
+                btnText.innerHTML = `Оформить ${name} ($${price}) &rarr;`;
+            }
+        }
+    }
+
+    function triggerCheckout() {
+        if (!currentSelectedPlan.id) return;
+        const form = document.getElementById('checkout-form');
+        form.action = `/subscription/checkout/${currentSelectedPlan.id}/`;
+        document.getElementById('modal-plan-name').innerText = `Тариф: ${currentSelectedPlan.name}`;
+        document.getElementById('modal-submit-price').innerText = `($${currentSelectedPlan.price})`;
+        document.getElementById('checkout-modal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkout-modal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function formatCardNumber(input) {
+        let v = input.value.replace(/\D/g, '').substring(0, 16);
+        let matches = v.match(/\d{4,16}/g);
+        let match = (matches && matches[0]) || '';
+        let parts = [];
+        for (let i = 0, len = match.length; i < len; i += 4) {
+            parts.push(match.substring(i, i + 4));
+        }
+        if (parts.length) {
+            input.value = parts.join(' ');
+        } else {
+            input.value = v;
+        }
+        document.getElementById('card-preview-number').innerText = input.value || '•••• •••• •••• ••••';
+    }
+
+    function formatExp(input) {
+        let v = input.value.replace(/\D/g, '').substring(0, 4);
+        if (v.length >= 2) {
+            input.value = v.substring(0, 2) + '/' + v.substring(2, 4);
+        } else {
+            input.value = v;
+        }
+        document.getElementById('card-preview-exp').innerText = input.value || 'MM/YY';
+    }
+
+    function updateHolder(input) {
+        document.getElementById('card-preview-holder').innerText = input.value.toUpperCase() || 'ИМЯ ДЕРЖАТЕЛЯ';
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', function() {
+        const btn = document.getElementById('modal-submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span>Обработка платежа...</span>';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        {% if plans %}
+            {% if user_sub %}
+                {% for p in plans %}
+                    {% if user_sub.plan.id == p.id %}
+                        selectDuration('{{ p.id }}', '{{ p.name|escapejs }}', '{{ p.price }}', '{{ p.duration_months }}', '{{ p.discount_percent }}');
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% with p=plans|last %}
+                    selectDuration('{{ p.id }}', '{{ p.name|escapejs }}', '{{ p.price }}', '{{ p.duration_months }}', '{{ p.discount_percent }}');
+                {% endwith %}
+            {% endif %}
+        {% endif %}
+    });
+</script>
+{% endblock %}

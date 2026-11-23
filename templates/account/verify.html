@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение email — Globed.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lightBg: '#ffffff',
+                        cardBg: '#fafafa',
+                        borderLight: '#e5e5e5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-neutral-900 font-sans antialiased selection:bg-black selection:text-white flex flex-col min-h-screen">
+
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-borderLight">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <a href="{% url 'home' %}" class="text-2xl font-black tracking-tight text-black">Globed<span class="text-neutral-400">.ai</span></a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-neutral-600">Не получили код?</span>
+                <a href="#" class="text-sm font-medium text-black underline hover:text-neutral-700 transition">Отправить снова</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-16">
+        <div class="w-full max-w-md bg-cardBg border border-borderLight p-8 sm:p-10 rounded-3xl shadow-xl shadow-black/5 text-center">
+            <div class="w-12 h-12 bg-neutral-100 border border-borderLight rounded-2xl flex items-center justify-center text-xl font-bold mx-auto mb-6 shadow-sm">✉️</div>
+            
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 text-black">Введите код подтверждения</h1>
+            <p class="text-sm text-neutral-600 mb-8">
+                Мы отправили одноразовый код (OTP) на адрес <span class="font-semibold text-black">{{ email }}</span>. Срок действия кода ограничен.
+            </p>
+
+            <form method="post" action="{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="space-y-6">
+                {% csrf_token %}
+                {% if request.GET.next %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                {% endif %}
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm text-left">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="text-left">
+                        <label class="block text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs mt-1.5">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="w-full bg-black text-white font-semibold py-3.5 rounded-xl hover:bg-neutral-800 transition shadow-lg shadow-black/5">
+                    Подтвердить и войти
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-borderLight text-center text-xs text-neutral-500">
+                Возникли проблемы с кодом? Напишите в поддержку: <span class="text-black font-semibold">support@globed.ai</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-8 bg-lightBg text-xs text-neutral-500 border-t border-borderLight text-center">
+        &copy; 2026 Globed.ai. Все права защищены.
+    </footer>
+
+</body>
+</html>
